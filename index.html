@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loomis Construction - Employee Portal</title>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("tTcpWKiXWJ9ZECnCK");
+        })();
+    </script>
+    <!-- html2canvas Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* PASSWORD MODAL STYLES */
+        #password-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(249, 249, 249, 0.96);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .password-card {
+            background: #ffffff;
+            padding: 35px 30px;
+            border-radius: 12px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            box-sizing: border-box;
+        }
+        .password-card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #2e7d32;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .password-card p {
+            font-size: 15px;
+            color: #555555;
+            line-height: 1.4;
+            margin-top: 0;
+            margin-bottom: 22px;
+        }
+        .password-card input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .password-card button {
+            width: 100%;
+            background-color: #2e7d32;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .password-card button:hover {
+            background-color: #1b5e20;
+        }
+        #password-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* MAIN CONTAINER */
+        .portal-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* HEADER & BRANDING */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e8f5e9;
+            padding-bottom: 12px;
+            padding-top: 10px;
+        }
+        .brand-logo {
+            max-width: 310px;
+            height: auto;
+            margin: -25px auto -35px auto;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        .employee-title-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 0;
+            position: relative;
+            z-index: 2;
+        }
+        .employee-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1b5e20;
+            margin: 0;
+        }
+        .employee-position {
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            background-color: #f1f8e9;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid #c8e6c9;
+        }
+        .employee-address {
+            font-size: 14px;
+            color: #444;
+            margin-top: 4px;
+            margin-bottom: 0;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* MATCHED GREEN MESSAGES BACKGROUND */
+        .welcome-banner {
+            background-color: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+            padding: 16px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            color: #1b5e20;
+        }
+        .quick-updates-box {
+            background-color: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            color: #1b5e20;
+        }
+        .quick-updates-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #1b5e20;
+            text-transform: uppercase;
+        }
+
+        /* SECTION STYLES */
+        .section-block {
+            margin-bottom: 35px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .section-title {
+            color: #2e7d32;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* HIGHLIGHT CARD GRID */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .meta-box {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 10px 14px;
+            border-radius: 6px;
+        }
+        .meta-box span {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #777;
+            font-weight: bold;
+        }
+        .meta-box strong {
+            font-size: 14px;
+            color: #222;
+        }
+
+        /* LISTS */
+        .bullet-list {
+            padding-left: 20px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        .bullet-list li {
+            margin-bottom: 6px;
+        }
+
+        /* PHASE BLOCKS */
+        .phase-card {
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .phase-card h4 {
+            margin-top: 0;
+            color: #1b5e20;
+            font-size: 16px;
+            border-bottom: 2px solid #e8f5e9;
+            padding-bottom: 6px;
+        }
+
+        /* CONDITIONAL CONTAINER DISPLAY */
+        .conditional-box {
+            display: none;
+            margin-top: 12px;
+            padding: 12px 15px;
+            background-color: #ffffff;
+            border: 1px solid #c8e6c9;
+            border-radius: 6px;
+            font-style: italic;
+            color: #444;
+            font-size: 13.5px;
+            line-height: 1.4;
+        }
+
+        .checkbox-label, .radio-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .highlight-yellow {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: block;
+            font-weight: bold;
+        }
+
+        .highlight-yellow-bold {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 10px 14px;
+            border-radius: 4px;
+            display: block;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 12px;
+        }
+
+        /* WELCOME PACKAGE STAR GRID CARD */
+        .welcome-package-card {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .star-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .star-item {
+            font-size: 13.5px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* BUTTONS */
+        .submit-btn {
+            width: 100%;
+            background-color: #2e7d32;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s ease;
+        }
+        .submit-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        /* SECONDARY CONFIRMATION VIEW */
+        #confirmation-view {
+            display: none;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin: 30px auto;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+        }
+        .confirm-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        /* SUCCESS MESSAGE */
+        #in-place-success {
+            display: none;
+            margin-top: 25px;
+            padding: 22px;
+            background-color: #f1f8e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 42px;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+        .success-title {
+            color: #1b5e20;
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .success-body-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #333333;
+            margin-bottom: 12px;
+        }
+        .success-sub-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #555555;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PASSWORD MODAL OVERLAY -->
+    <div id="password-modal-overlay">
+        <div class="password-card">
+            <h3>Protected Employee Portal</h3>
+            <p>Good evening Quandreas, please enter password to begin.</p>
+            <input type="password" id="page-password-input" placeholder="Enter Password" onkeypress="handlePasswordKeyPress(event)">
+            <button type="button" onclick="validatePassword()">Access Portal</button>
+            <div id="password-error">Incorrect password. Please try again.</div>
+        </div>
+    </div>
+
+    <!-- MAIN FORM WRAPPER -->
+    <form id="employee-onboarding-form">
+
+        <!-- MAIN PORTAL VIEW -->
+        <div id="main-portal-view" class="portal-container">
+            <!-- BRANDING & EMPLOYEE HEADER -->
+            <div class="brand-header">
+                <img class="brand-logo" src="1nobg.png" alt="Loomis Construction Logo">
+                <div class="employee-title-row">
+                    <h1 class="employee-name">Quandreas Q. Surles</h1>
+                    <span class="employee-position">Site Preparation & Transport Operator</span>
+                </div>
+                <p class="employee-address">6565 Cushing Dr, Fayetteville, NC 28311</p>
+            </div>
+
+            <!-- WELCOME MESSAGE BANNER -->
+            <div class="welcome-banner">
+                <strong>Quandreas</strong>, Loomis Construction wants to congratulate and thank you for choosing to join our team. We know you are going to change the game in this industry and Elianna is more than excited to let you know the next steps. There will be a lot of training required so please read this <strong>thoroughly</strong>.
+            </div>
+
+            <!-- QUICK POSITION UPDATES BANNER -->
+            <div class="quick-updates-box">
+                <h4>QUICK POSITION UPDATES</h4>
+                <ul class="bullet-list" style="margin-bottom: 0;">
+                    <li>Pay <strong>increase</strong> to $1,500 per site completed</li>
+                    <li>The minimum number required of sites to be done per month is <strong>2</strong></li>
+                    <li>The maximum number of sites that can be completed per month is <strong>5</strong></li>
+                    <li>The travel time has <strong>decreased</strong> and will not exceed being a month away</li>
+                    <li>There are no more twelve hour shifts</li>
+                    <li>There is shift <strong>flexibility</strong> to choose from:
+                        <ul style="margin-top: 4px; padding-left: 20px; list-style-type: none;">
+                            <li><strong>a)</strong> 6am-5pm Monday-Thursday</li>
+                            <li><strong>b)</strong> 6am-3pm Monday-Friday</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 1. ORIENTATION SECTION -->
+            <div class="section-block">
+                <div class="section-title">1. Orientation Details</div>
+                
+                <div class="meta-grid">
+                    <div class="meta-box">
+                        <span>Expected Shift</span>
+                        <strong>1 - 2.5 Hours</strong>
+                    </div>
+                    <div class="meta-box">
+                        <span>Compensation</span>
+                        <strong>$25 Gift Card</strong>
+                    </div>
+                    <div class="meta-box">
+                        <span>Location</span>
+                        <strong>Remote</strong>
+                    </div>
+                    <div class="meta-box">
+                        <span>Date & Time</span>
+                        <strong>Oct 17th @ 2pm</strong>
+                    </div>
+                </div>
+
+                <p style="font-weight: bold; margin-bottom: 5px;">Objectives & Key Items:</p>
+                <ul class="bullet-list">
+                    <li>Learn about the company & our mission statement</li>
+                    <li>Learn about the Founder (for those who do not know me at all or not as well as others)</li>
+                    <li>Hierarchy of the departments and roles in the company</li>
+                    <li><strong>ICE BREAKER:</strong> Introduce yourself to the team and meet your team.</li>
+                    <li>Receive NDA Compliance Contracts to go through and sign (via DocuSign)</li>
+                </ul>
+            </div>
+
+            <!-- 2. TRAINING SCHEDULE & SELECTION -->
+            <div class="section-block">
+                <div class="section-title">2. Training Schedule & Selection</div>
+                
+                <div class="meta-grid">
+                    <div class="meta-box">
+                        <span>Expected Shift</span>
+                        <strong>Based on Training</strong>
+                    </div>
+                    <div class="meta-box">
+                        <span>Compensation</span>
+                        <strong>Flat Base Pay and/or Hourly</strong>
+                    </div>
+                    <div class="meta-box">
+                        <span>Location</span>
+                        <strong>Remote & Field Options</strong>
+                    </div>
+                </div>
+
+                <div style="background-color: #fafafa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+                    Training for the Site Clearing Department will be in five phases. These are the five phases:
+                    <ol style="margin-top: 8px; margin-bottom: 12px; padding-left: 20px;">
+                        <li><strong>Phase 1: The Commercial Driving Foundation</strong> — CDL A & B Licenses 5 to 10 weeks of physical driving instruction</li>
+                        <li><strong>Phase 2: Core Safety Credentials</strong> — OSHA 10 Construction & NC 811 Dig Safety 2 to 3 days total. Option to be done online*</li>
+                        <li><strong>Phase 3: Advanced Timber & Heavy Field Logistics</strong> — NC ProLogger "Base Module" A structured 3-day course focused on heavy timber removal, wood logistics, and forestry safety.</li>
+                        <li><strong>Phase 4: The Hands-On Trades Verification</strong> — NCCER CORE Single-Day Physical Assessment (4-to-6 hour hands-on session where they test out of the safety book work and physically prove their rigging and hand/power tool skills).</li>
+                        <li><strong>Phase 5: The Final Site-Ready Certifications</strong> — Chainsaw Safety, Road Flagger, and CPR/First Aid (2 days of quick, localized field workshops to get them fully cleared to deploy).</li>
+                    </ol>
+                    <p style="margin: 0; font-weight: bold; color: #2e7d32;">For each phase and training please choose the training option, dates, that are most convenient for you.</p>
+                </div>
+
+                <!-- PHASE 1 -->
+                <div class="phase-card">
+                    <h4>PHASE 1: Commercial Driving Foundation</h4>
+                    <p style="font-size: 13.5px; line-height: 1.4; color: #444;">This team will consist of 4 members, the Transport Operators will be the two on this team who will have CDL A & B, both don't have to be attained at this moment, only one.</p>
+                    <p style="font-weight: bold; font-size: 14px; margin-bottom: 10px;">Please choose which CDL you would like to obtain first:</p>
+
+                    <!-- CDL A OPTION -->
+                    <label class="radio-label">
+                        <input type="radio" name="cdl_phase1" value="CDL A" onchange="togglePhase1(this)">
+                        <span><strong>CDL A (The Logistics Hauler)</strong></span>
+                    </label>
+                    <div id="cdl-a-box" class="conditional-box">
+                        TRAINING: 10 Weeks<br>
+                        This operator's primary job will be heavy transport. They are legally cleared to drive a large truck (like a heavy duty truck or semi) towing a heavy equipment trailer loaded with excavators, bulldozers, or skid steers over 10,000 lbs GVWR.<br><br>
+                        <strong>Select your preferred cohort:</strong>
+                        <div style="margin-top: 8px;">
+                            <label class="checkbox-label"><input type="checkbox" name="cdl_a_cohort" value="October 26, 2026 - November 20, 2026 FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE" onchange="handleSingleChoice(this, 'cdl_a_cohort')"> Class A Cohorts consecutively FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE (October 26, 2026 - November 20, 2026)</label>
+                            <label class="checkbox-label"><input type="checkbox" name="cdl_a_cohort" value="November 23, 2026 - December 18, 2026 CENTRAL CAROLINA COMMUNITY COLLEGE" onchange="handleSingleChoice(this, 'cdl_a_cohort')"> November 23, 2026 - December 18, 2026 CENTRAL CAROLINA COMMUNITY COLLEGE</label>
+                            <label class="checkbox-label"><input type="checkbox" name="cdl_a_cohort" value="December 21, 2026 - January 15, 2027 CENTRAL CAROLINA COMMUNITY COLLEGE" onchange="handleSingleChoice(this, 'cdl_a_cohort')"> December 21, 2026 - January 15, 2027 CENTRAL CAROLINA COMMUNITY COLLEGE</label>
+                            <label class="checkbox-label"><input type="checkbox" name="cdl_a_cohort" value="October 19th, 2026 Daytime Class SAMPSON COMMUNITY COLLEGE" onchange="handleSingleChoice(this, 'cdl_a_cohort')"> October 19th, 2026 Daytime Class SAMPSON COMMUNITY COLLEGE</label>
+                        </div>
+                    </div>
+
+                    <!-- CDL B OPTION -->
+                    <label class="radio-label" style="margin-top: 10px;">
+                        <input type="radio" name="cdl_phase1" value="CDL B" onchange="togglePhase1(this)">
+                        <span><strong>CDL B (Debris & Site Operator)</strong></span>
+                    </label>
+                    <div id="cdl-b-box" class="conditional-box">
+                        TRAINING: 5 Weeks<br>
+                        This operator can immediately start driving single-bodied heavy vehicles- like your tandem-axle dump trucks, knuckleboom log trucks, or chip trucks used to haul away the heavy timber, woods, and bushes from the vacant lots.<br><br>
+                        <strong>Select your preferred cohort:</strong>
+                        <div style="margin-top: 8px;">
+                            <label class="checkbox-label"><input type="checkbox" name="cdl_b_cohort" value="November 16, 2026 - December 8, 2026 FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE"> November 16, 2026 - December 8, 2026 FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHASE 2 -->
+                <div class="phase-card">
+                    <h4>PHASE 2: Core Safety</h4>
+                    <p style="font-size: 13.5px; color: #444; margin-bottom: 5px;"><strong>OSHA 10-Hour Safety Construction</strong><br>This is a federal standard issued directly by the U.S. Department of Labor.</p>
+                    <p style="font-weight: bold; font-size: 14px; margin-bottom: 10px;">Please choose the type of training you’d like for OSHA:</p>
+
+                    <label class="radio-label">
+                        <input type="radio" name="osha_type" value="Online" onchange="toggleOsha(this)">
+                        <span>Online</span>
+                    </label>
+                    <div id="osha-online-box" class="conditional-box">
+                        <label class="checkbox-label"><input type="checkbox" name="osha_online_check" value="AT HOME"> <strong>AT HOME</strong></label>
+                        <em>I understand that I have the option to take the OSHA 10-Hour Safety Construction course at home and this is self paced. It requires 7.5-10 hours of video/modules and you will download your certificate upon completion.</em>
+                    </div>
+
+                    <label class="radio-label" style="margin-top: 10px;">
+                        <input type="radio" name="osha_type" value="In Person at Community College" onchange="toggleOsha(this)">
+                        <span>In Person at Community College</span>
+                    </label>
+                    <div id="osha-inperson-box" class="conditional-box">
+                        <div style="margin-bottom: 12px;">
+                            <label class="checkbox-label"><input type="checkbox" name="osha_cc_choice" value="FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE" onchange="toggleOshaCc(this)"> FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE</label>
+                            <div id="osha-fay-info" style="display:none; padding-left:25px;" class="conditional-box">
+                                <em>I understand that this is a private cohort to be requested by my employer, and the team will be assigned a private instructor.</em>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label class="checkbox-label"><input type="checkbox" name="osha_cc_choice" value="CENTRAL CAROLINA COMMUNITY COLLEGE" onchange="toggleOshaCc(this)"> CENTRAL CAROLINA COMMUNITY COLLEGE</label>
+                            <div id="osha-central-info" style="display:none; padding-left:25px;" class="conditional-box">
+                                <em>I understand that this includes a Forklift with OSHA track or a private cohort to be requested by my employer.</em>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="checkbox-label"><input type="checkbox" name="osha_cc_choice" value="SAMPSON COMMUNITY COLLEGE" onchange="toggleOshaCc(this)"> SAMPSON COMMUNITY COLLEGE</label>
+                            <div id="osha-sampson-info" style="display:none; padding-left:25px;" class="conditional-box">
+                                <em>I understand that these are individual public safety classes, that are spread out and have limited seats.</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
+
+                    <p style="font-size: 13.5px; color: #444; margin-bottom: 5px;"><strong>811 Utility Safety</strong><br>This is training on “Call Before You Dig” laws, ground-marking, color codes, and safe mechanical clearance tolerances around buried power, gas, and water lines.</p>
+                    <p style="font-weight: bold; font-size: 14px; margin-bottom: 10px;">Please choose how you’d like to complete your 811 Utility Safety training:</p>
+
+                    <label class="radio-label">
+                        <input type="radio" name="utility_811_type" value="Online" onchange="toggle811(this)">
+                        <span>Online</span>
+                    </label>
+                    <div id="util-online-box" class="conditional-box">
+                        <label class="checkbox-label"><input type="checkbox" name="util_online_check" value="REMOTE"> <strong>REMOTE</strong></label>
+                        <em>I understand this is a free, self-paced online curriculum that takes approximately 1 hour total to complete. There are no set dates, available 24/7.</em>
+                    </div>
+
+                    <label class="radio-label" style="margin-top: 10px;">
+                        <input type="radio" name="utility_811_type" value="In-Person" onchange="toggle811(this)">
+                        <span>In-Person</span>
+                    </label>
+                    <div id="util-inperson-box" class="conditional-box">
+                        <label class="checkbox-label"><input type="checkbox" name="util_inperson_check" value="UCC Meetings"> <strong>UCC Meetings</strong></label>
+                        <em>I understand that this meeting takes place every single month and is a free meeting to attend, this generally takes place on weekday mornings and provides field updates on local dig laws and regional safety standards.</em>
+                    </div>
+                </div>
+
+                <!-- PHASE 3 -->
+                <div class="phase-card">
+                    <h4>PHASE 3: Advanced Timber & Heavy Field Logistics</h4>
+                    <p style="font-size: 13.5px; line-height: 1.5; color: #444;">
+                        This program teaches BMPs (Best Management Practices) for timber removal, mechanical tree felling safety, and avoiding environmental damage. Unfortunately, the final NCFA ProLogger Base Class of the year just concluded on September 2nd & 3rd. There are only three physical base courses per year. I have added each of you to their HoldList for when the next public class is ready. I have also reached out to the Director of Forestry Programs directly to see if Mr. Powell can find us a pop-up class, or something soon.
+                    </p>
+                    <p style="font-size: 12.5px; color: #666; font-style: italic; margin-bottom: 12px;">
+                        *Note: They do not allow private training for classes smaller than 10 people, in the worst case scenario Mr. Powell could potentially pull in 6 other workers from his local waitlist to hit their class size minimum instantly.
+                    </p>
+                    <label class="checkbox-label highlight-yellow">
+                        <input type="checkbox" name="phase3_confirm" value="Read and Understood">
+                        <span>Please check this to confirm you have read</span>
+                    </label>
+                </div>
+
+                <!-- PHASE 4 -->
+                <div class="phase-card">
+                    <h4>PHASE 4: The Hands-On Trades Verification</h4>
+                    <div class="highlight-yellow-bold">
+                        The NCCER Core Curriculum is an industry-standard credential issued by the National Center for Construction Education & Research.
+                    </div>
+                    <p style="font-size: 13.5px; line-height: 1.5; color: #444; margin-bottom: 12px;">
+                        Under national rules, an official OSHA 10 card automatically replaces the first 10 hours of the NCCER CORE textbook curriculum and exempts you from having to take the written NCCER Basic Safety test. Single-day testing format is not a public class and is instead handled as an Employer Testing Day.
+                    </p>
+
+                    <label class="radio-label">
+                        <input type="radio" name="phase4_nccer" value="Single Day FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE" onchange="togglePhase4(this)">
+                        <span><strong>Single Day FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE</strong></span>
+                    </label>
+                    <div id="nccer-box" class="conditional-box">
+                        This single day includes Basic Safety Check, Hand & Power Tools Assessment, Basic Rigging & Signaling Assessment, and Construction Math & Material Handling.<br><br>
+                        <em>I understand that this NCCER CORE curriculum will be combined into a 4-6 hour single day private employee testing day requested by my employer.</em>
+                    </div>
+                </div>
+
+                <!-- PHASE 5 -->
+                <div class="phase-card">
+                    <h4>PHASE 5: The Final Site-Ready Certifications</h4>
+                    <p style="font-size: 13.5px; color: #444; margin-bottom: 12px;">
+                        These are required and in this order as you cannot register for the online courses below without having your CPR/FIRST AID.
+                    </p>
+
+                    <p style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">Please choose your training dates for CPR: CPR/AED & FIRST AID</p>
+                    <label class="checkbox-label"><input type="checkbox" name="cpr_date" value="September 26, 2026 AT 9:00AM FAYETTEVILLE CAMPUS" onchange="handleSingleChoice(this, 'cpr_date')"> September 26, 2026 AT 9:00AM FAYETTEVILLE CAMPUS</label>
+                    <label class="checkbox-label"><input type="checkbox" name="cpr_date" value="September 26, 2026 AT 4:30PM AMERICAN RED CROSS (Fayetteville Chapter)" onchange="handleSingleChoice(this, 'cpr_date')"> September 26, 2026 AT 4:30PM AMERICAN RED CROSS (Fayetteville Chapter)</label>
+                    <label class="checkbox-label"><input type="checkbox" name="cpr_date" value="Self Paced FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE" onchange="handleSingleChoice(this, 'cpr_date')"> Self Paced FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE</label>
+                    <label class="checkbox-label"><input type="checkbox" name="cpr_date" value="Self Guided Verification Station SAME DAY CPR FAYETTEVILLE" onchange="handleSingleChoice(this, 'cpr_date')"> Self Guided Verification Station SAME DAY CPR FAYETTEVILLE</label>
+
+                    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+                    <p style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">CHAINSAW SAFETY requires online + field</p>
+                    <div>
+                        <label class="checkbox-label"><input type="checkbox" name="chainsaw_opt" value="Online" onchange="toggleChainsaw(this)"> Online</label>
+                        <div id="chainsaw-online-info" style="display:none; padding-left: 25px;" class="conditional-box">
+                            <em>I understand that I can take the online 60-minute course.</em>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <label class="checkbox-label"><input type="checkbox" name="chainsaw_opt" value="In Person" onchange="toggleChainsaw(this)"> In Person</label>
+                        <div id="chainsaw-inperson-info" style="display:none; padding-left: 25px;" class="conditional-box">
+                            <em>I understand this is an in-person field day which will be a 1-day physical field cutting exercise, to be requested by my employer.</em>
+                        </div>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+                    <p style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">ROAD FLAGGING requires online</p>
+                    <p style="font-size: 13.5px; color: #555; margin-bottom: 8px;">Please choose your type of training:</p>
+
+                    <label class="radio-label">
+                        <input type="radio" name="flagging_type" value="Online" onchange="toggleFlagging(this)">
+                        <span>Online</span>
+                    </label>
+                    <div id="flagging-online-box" class="conditional-box">
+                        <em>I understand I have the option to choose a) this hour 60-minute online course and pass to receive certificate.</em>
+                    </div>
+
+                    <label class="radio-label" style="margin-top: 10px;">
+                        <input type="radio" name="flagging_type" value="In Person" onchange="toggleFlagging(this)">
+                        <span>In Person</span>
+                    </label>
+                    <div id="flagging-inperson-box" class="conditional-box">
+                        <em>I understand I have the option to choose b) a specific school for training and have to complete field day.</em>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. ANALYSIS DEPARTMENT & REGIONS -->
+            <div class="section-block">
+                <div class="section-title">3. Analysis Department & Regions</div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Full names will not be given until Orientation. Ratio 4M.</p>
+
+                <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 18px; background-color: #ffffff;">
+                    <h4 style="margin-top: 0; color: #2e7d32; border-bottom: 2px solid #e8f5e9; padding-bottom: 5px;">South Region</h4>
+                    <p style="font-size: 13px; margin: 0 0 10px 0; color: #555;"><strong>States:</strong> Florida, North Carolina, South Carolina, and Tennessee</p>
+                    <p style="font-size: 13.5px; line-height: 1.5; color: #333; margin: 0;">
+                        Site clearing will begin in Florida first and North Carolina, but the majority of Florida. Based on the progress and if requirements are constantly being met by all members, I will then release South Carolina and Tennessee inventory to choose from.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. EQUIPMENT & WELCOME PACKAGE -->
+            <div class="section-block">
+                <div class="section-title">4. Equipment & Welcome Package</div>
+                <p style="font-size: 14px; margin-bottom: 10px;">You all will either share and/or have your own equipment provided by the company that will help you clear sites, these include:</p>
+
+                <ul class="bullet-list" style="font-size: 14px;">
+                    <li>Gas Chainsaw (16"-18" Bar)</li>
+                    <li>Commercial String Trimmer</li>
+                    <li>Metal Brush Cutter Blade Attachment</li>
+                    <li>Heavy-Duty Loppers</li>
+                    <li>Mattock or Pulaski</li>
+                    <li>Pointed Digging Shovel</li>
+                    <li>Manual Brush Grubber / Puller</li>
+                </ul>
+
+                <p style="font-size: 13px; color: #555; background-color: #f9f9f9; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #2e7d32; margin-top: 15px;">
+                    <strong>Note:</strong> for any Heavy Machinery such as Tracked Mini Skid Steer, Compact Track Loader, Root Grapple, Commercial Woodchipper, etc., heavy items such as these will be rented.
+                </p>
+
+                <div class="welcome-package-card">
+                    <p style="font-weight: bold; margin-top: 0; margin-bottom: 10px; font-size: 14px;">1 Welcome To The Team Package (Company Customized):</p>
+                    <div class="star-grid">
+                        <div class="star-item">★ Can cooler sleeve</div>
+                        <div class="star-item">★ Tumbler Mug</div>
+                        <div class="star-item">★ Adidas Embroidery Defender Backpack</div>
+                        <div class="star-item">★ Midweight Neck Gaiter</div>
+                        <div class="star-item">★ Head Cap</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 1 SUBMIT BUTTON -->
+            <button type="button" id="step1-btn" class="submit-btn" onclick="captureAndGoToConfirmation()">Confirm & Submit Training Selection</button>
+        </div>
+
+        <!-- FINAL ONBOARDING CONFIRMATION VIEW (STEP 2) -->
+        <div id="confirmation-view">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h2 style="color: #1b5e20; margin: 0; font-size: 24px;">Final Onboarding Confirmation</h2>
+                <p style="font-size: 14px; color: #666; margin-top: 5px;">Please verify your training week and delivery details below:</p>
+            </div>
+
+            <div class="confirm-card">
+                <label class="checkbox-label" style="margin-bottom: 15px;">
+                    <input type="checkbox" id="confirm_training_stick" required>
+                    <span>I confirm that all of the training selected is what I plan to stick to.</span>
+                </label>
+
+                <label class="checkbox-label" style="margin-bottom: 15px;">
+                    <input type="checkbox" id="confirm_address_correct" checked>
+                    <span>My mailing address listed below is correct for equipment delivery. <em>(Uncheck to update address)</em></span>
+                </label>
+
+                <div style="text-align: center; font-weight: bold; color: #444; padding: 10px; background: #f9f9f9; border-radius: 6px; font-size: 14px;">
+                    6565 Cushing Dr, Fayetteville, NC 28311
+                </div>
+            </div>
+
+            <button type="submit" id="final-submit-btn" class="submit-btn">Final Confirm & Save Record</button>
+
+            <!-- IN-PLACE SUCCESS MESSAGE -->
+            <div id="in-place-success">
+                <div class="success-icon">✓</div>
+                <h3 class="success-title">Selection Confirmed!</h3>
+                <p class="success-body-text">
+                    Thank you <strong>Quandreas</strong>! Your training selections have been recorded and a copy has been saved to your local device.
+                </p>
+                <p class="success-sub-text">
+                    We are thrilled to have you join Loomis Construction! Keep an eye on your email for your DocuSign NDA and further onboarding instructions.
+                </p>
+            </div>
+        </div>
+
+    </form>
+
+    <script>
+        // PASSWORD PROTECTION LOGIC
+        const correctPasscode = "Loomis2026";
+
+        function validatePassword() {
+            const userPass = document.getElementById("page-password-input").value;
+            const errorMsg = document.getElementById("password-error");
+            
+            if (userPass === correctPasscode) {
+                document.getElementById("password-modal-overlay").style.display = "none";
+            } else {
+                errorMsg.style.display = "block";
+                document.getElementById("page-password-input").value = "";
+            }
+        }
+
+        function handlePasswordKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                validatePassword();
+            }
+        }
+
+        // ENFORCE SINGLE CHOICE ON CHECKBOX GROUPS (PHASE 1 & PHASE 5 CPR)
+        function handleSingleChoice(checkbox, groupName) {
+            if (checkbox.checked) {
+                const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+                checkboxes.forEach(cb => {
+                    if (cb !== checkbox) cb.checked = false;
+                });
+            }
+        }
+
+        // DYNAMIC CONDITIONAL VISIBILITY TOGGLES
+        function togglePhase1(radio) {
+            document.getElementById("cdl-a-box").style.display = (radio.value === "CDL A") ? "block" : "none";
+            document.getElementById("cdl-b-box").style.display = (radio.value === "CDL B") ? "block" : "none";
+        }
+
+        function toggleOsha(radio) {
+            document.getElementById("osha-online-box").style.display = (radio.value === "Online") ? "block" : "none";
+            document.getElementById("osha-inperson-box").style.display = (radio.value === "In Person at Community College") ? "block" : "none";
+        }
+
+        function toggleOshaCc(cb) {
+            if (cb.value === "FAYETTEVILLE TECHNICAL COMMUNITY COLLEGE") {
+                document.getElementById("osha-fay-info").style.display = cb.checked ? "block" : "none";
+            } else if (cb.value === "CENTRAL CAROLINA COMMUNITY COLLEGE") {
+                document.getElementById("osha-central-info").style.display = cb.checked ? "block" : "none";
+            } else if (cb.value === "SAMPSON COMMUNITY COLLEGE") {
+                document.getElementById("osha-sampson-info").style.display = cb.checked ? "block" : "none";
+            }
+        }
+
+        function toggle811(radio) {
+            document.getElementById("util-online-box").style.display = (radio.value === "Online") ? "block" : "none";
+            document.getElementById("util-inperson-box").style.display = (radio.value === "In-Person") ? "block" : "none";
+        }
+
+        function togglePhase4(radio) {
+            document.getElementById("nccer-box").style.display = radio.checked ? "block" : "none";
+        }
+
+        function toggleChainsaw(cb) {
+            if (cb.value === "Online") {
+                document.getElementById("chainsaw-online-info").style.display = cb.checked ? "block" : "none";
+            } else if (cb.value === "In Person") {
+                document.getElementById("chainsaw-inperson-info").style.display = cb.checked ? "block" : "none";
+            }
+        }
+
+        function toggleFlagging(radio) {
+            document.getElementById("flagging-online-box").style.display = (radio.value === "Online") ? "block" : "none";
+            document.getElementById("flagging-inperson-box").style.display = (radio.value === "In Person") ? "block" : "none";
+        }
+
+        // CAPTURE FRONT PAGE SCREENSHOT THEN GO TO STEP 2 CONFIRMATION
+        function captureAndGoToConfirmation() {
+            const step1Btn = document.getElementById("step1-btn");
+            step1Btn.innerText = "Capturing Selections & Proceeding...";
+            step1Btn.disabled = true;
+
+            const mainPortal = document.getElementById("main-portal-view");
+
+            html2canvas(mainPortal, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                ignoreElements: function(element) {
+                    return element.tagName === 'IMG' && element.src.startsWith('file://');
+                }
+            }).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "Quandreas_Loomis_Onboarding_Selection.png";
+                link.href = canvas.toDataURL("image/png");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Transition to Confirmation step
+                step1Btn.innerText = "Confirm & Submit Training Selection";
+                step1Btn.disabled = false;
+                mainPortal.style.display = "none";
+                document.getElementById("confirmation-view").style.display = "block";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }).catch(err => {
+                console.error("Capture warning:", err);
+                step1Btn.innerText = "Confirm & Submit Training Selection";
+                step1Btn.disabled = false;
+                mainPortal.style.display = "none";
+                document.getElementById("confirmation-view").style.display = "block";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // FINAL SUBMISSION HANDLING
+        document.getElementById("employee-onboarding-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const finalBtn = document.getElementById("final-submit-btn");
+            finalBtn.innerText = "Saving Record...";
+            finalBtn.disabled = true;
+
+            emailjs.sendForm("eliannaf.ef@gmail.com", "template_8zrdc8o", document.getElementById("employee-onboarding-form"))
+            .then(() => {
+                finalBtn.style.display = "none";
+                document.getElementById("in-place-success").style.display = "block";
+            }).catch(err => {
+                console.error("EmailJS Error:", err);
+                finalBtn.style.display = "none";
+                document.getElementById("in-place-success").style.display = "block";
+            });
+        });
+    </script>
+</body>
+</html>
